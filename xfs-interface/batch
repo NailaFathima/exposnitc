@@ -1,0 +1,13 @@
+load --os ../spl/spl_prog/os_startup_st15.xsm
+load --library ../expl/library.lib
+load --int=timer ../spl/spl_prog/sample_timer_st15.xsm
+load --int=7 ../spl/spl_prog/sample_int7_st15.xsm
+load --int=10 ../spl/spl_prog/sample_int10_st15.xsm
+load --exhandler ../spl/spl_prog/haltprog.xsm
+load --module 0 ../spl/spl_prog/module0_st15.xsm
+load --module 4 ../spl/spl_prog/module4_st15.xsm
+load --module 5 ../spl/spl_prog/module5_st14.xsm
+load --module 7 ../spl/spl_prog/module7_st15.xsm
+load --idle ../expl/expl_progs/idle.xsm
+load --init ../expl/expl_progs/odd_st14.xsm
+load --exec ../expl/expl_progs/eve_st14.xsm

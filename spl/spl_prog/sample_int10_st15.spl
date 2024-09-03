@@ -1,0 +1,21 @@
+[PROCESS_TABLE + ( [SYSTEM_STATUS_TABLE + 1] * 16) + 4] = TERMINATED;
+
+alias end R1;
+end = 1;
+
+alias index R2;
+index = 1;
+
+while (index != 16) do
+	if ( [PROCESS_TABLE + (index*16) + 4] != TERMINATED) then
+		end = 0;
+	endif;
+	index = index + 1;
+endwhile;
+
+if(end == 1) then
+	breakpoint;
+	halt;
+endif;
+
+call SCHEDULER;
