@@ -10,4 +10,3 @@ load --module 5 ../spl/spl_prog/module5_st14.xsm
 load --module 7 ../spl/spl_prog/module7_st15.xsm
 load --idle ../expl/expl_progs/idle.xsm
 load --init ../expl/expl_progs/odd_st14.xsm
-load --exec ../expl/expl_progs/eve_st14.xsm

@@ -13,10 +13,10 @@ if(functionNum == 3) then
 	print word;
 	
 	//calling release Terminal
-	multipush(R1,R2,R3);
+	multipush(R0,R1,R2,R3);
 	functionNum = 9;
 	call RESOURCE_MANAGER;
-	multipop(R1,R2,R3);
+	multipop(R0,R1,R2,R3);
 endif;
 
 return;

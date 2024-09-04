@@ -25,9 +25,9 @@ loadi(16,29);
 loadi(17,30);
 
 //loading exec code i.e even no.s code
-loadi(83,144);
+loadi(83,69);
 
-//loading MODULE 5 - scheduler
+//loading MODULE 7 - scheduler
 loadi(50,63);
 loadi(51,64);
 
@@ -38,6 +38,7 @@ loadi(41,54);
 //loading module 4 - disk device manager
 loadi(48,61);
 loadi(49,62);
+
 
 //Terminal status table
 [ TERMINAL_STATUS_TABLE + 0] = 0;
