@@ -1,0 +1,120 @@
+//BOOT MODULE
+
+//loadi(memory page no, disk page no);
+
+//loading init from disk to memory
+loadi(65,7);
+loadi(66,8);
+
+//loading int 10 module from disk to memory
+loadi(22,35);
+loadi(23,36);
+
+//loading exception handler routine from disk to memory
+loadi(2, 15);
+loadi(3, 16);
+
+//loading library from disk to memory
+loadi(63,13);
+loadi(64,14);
+
+//loading timer interrupt from disk to memory
+loadi(4, 17);
+loadi(5, 18);
+
+//loading int7 from disk to memory
+loadi(16,29);
+loadi(17,30);
+
+//loading exec code i.e even no.s code
+//loadi(83,69);
+
+//loading MODULE 5s - scheduler
+loadi(50,63);
+loadi(51,64);
+
+//loading module 0 - resource manager module
+loadi(40,53);
+loadi(41,54);
+
+//loading module 4 - disk device manager
+loadi(48,61);
+loadi(49,62);
+
+//loading console interrupt
+loadi(8,21);
+loadi(9,22);
+
+//loading int 6
+loadi(14,27);
+loadi(15,28);
+
+
+//Terminal status table
+[ TERMINAL_STATUS_TABLE + 0] = 0;
+
+//------INIT Program------
+
+//filling details in the process table
+
+
+PTBR = PAGE_TABLE_BASE + 20;
+PTLR = 10;
+
+[PROCESS_TABLE + 16 + 1] = 1;
+[PROCESS_TABLE + 16 + 4] = CREATED;
+[PROCESS_TABLE + 16 + 11] = 80;
+[PROCESS_TABLE + 16 + 12] = 0;
+[PROCESS_TABLE + 16 + 13] = 8*512;
+[PROCESS_TABLE + 16 + 14] = PAGE_TABLE_BASE + 20;
+[PROCESS_TABLE + 16 + 15] = 10;
+
+//LIBRARY
+[PAGE_TABLE_BASE + 20 +0] = 63;
+[PAGE_TABLE_BASE + 20 +1] = "0100";
+[PAGE_TABLE_BASE + 20 +2] = 64;
+[PAGE_TABLE_BASE + 20 +3] = "0100";
+
+//HEAP
+[PAGE_TABLE_BASE + 20 +4] = 78;
+[PAGE_TABLE_BASE + 20 +5] = "0110";
+[PAGE_TABLE_BASE + 20 +6] = 79;
+[PAGE_TABLE_BASE + 20 +7] = "0110";
+
+//CODE
+[PAGE_TABLE_BASE + 20 +8] = 65;
+[PAGE_TABLE_BASE + 20 +9] = "0100";
+[PAGE_TABLE_BASE + 20 +10] = 66;
+[PAGE_TABLE_BASE + 20 +11] = "0100";
+[PAGE_TABLE_BASE + 20 +12] = -1;
+[PAGE_TABLE_BASE + 20 +13] = "0000";
+[PAGE_TABLE_BASE + 20 +14] = -1;
+[PAGE_TABLE_BASE + 20 +15] = "0000";
+
+//STACK
+[PAGE_TABLE_BASE + 20 +16] = 76;
+[PAGE_TABLE_BASE + 20 +17] = "0110";
+[PAGE_TABLE_BASE + 20 +18] = 77;
+[PAGE_TABLE_BASE + 20 +19] = "0110";
+
+//first entry of init stack
+[76*512] = [65 * 512 + 1];
+
+//SET ALL OTHER PROCESSES TO TERMINATED
+
+[PROCESS_TABLE + 16*2 + 4] = TERMINATED;
+[PROCESS_TABLE + 16*3 + 4] = TERMINATED;
+[PROCESS_TABLE + 16*4 + 4] = TERMINATED;
+[PROCESS_TABLE + 16*5 + 4] = TERMINATED;
+[PROCESS_TABLE + 16*6 + 4] = TERMINATED;
+[PROCESS_TABLE + 16*7 + 4] = TERMINATED;
+[PROCESS_TABLE + 16*8 + 4] = TERMINATED;
+[PROCESS_TABLE + 16*9 + 4] = TERMINATED;
+[PROCESS_TABLE + 16*10 + 4] = TERMINATED;
+[PROCESS_TABLE + 16*11 + 4] = TERMINATED;
+[PROCESS_TABLE + 16*12 + 4] = TERMINATED;
+[PROCESS_TABLE + 16*13 + 4] = TERMINATED;
+[PROCESS_TABLE + 16*14 + 4] = TERMINATED;
+[PROCESS_TABLE + 16*15 + 4] = TERMINATED;
+
+return;

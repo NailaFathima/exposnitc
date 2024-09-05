@@ -1,0 +1,62 @@
+//loading idle from disk to memory
+loadi(69,11);
+loadi(70,12);
+
+//loading module 7 - BOOT MODULE from disk to memory
+loadi(54,67);
+loadi(55,68);
+
+SP = 82*512-1;
+//stack pointer set to supposed physical address of kernel stack
+call BOOT_MODULE;
+
+
+//-----IDLE PROGRAM----
+//filling details in the process table
+[PROCESS_TABLE + 1] = 0;
+[PROCESS_TABLE + 4] = RUNNING;
+[PROCESS_TABLE + 11] = 82;
+[PROCESS_TABLE + 12] = 0;
+[PROCESS_TABLE + 13] = 8*512;
+[PROCESS_TABLE + 14] = PAGE_TABLE_BASE;
+[PROCESS_TABLE + 15] = 10;
+
+//initialising page table
+//Library
+PTBR = PAGE_TABLE_BASE;
+PTLR = 10;
+[PAGE_TABLE_BASE + 0] = 63;
+[PAGE_TABLE_BASE + 1] = "0100";
+[PAGE_TABLE_BASE + 2] = 64;
+[PAGE_TABLE_BASE + 3] = "0100";
+
+//Heap
+[PAGE_TABLE_BASE + 4] = 83;
+[PAGE_TABLE_BASE + 5] = "0110";
+[PAGE_TABLE_BASE + 6] = 84;
+[PAGE_TABLE_BASE + 7] = "0110";
+
+//Code
+[PAGE_TABLE_BASE + 8] = 69;
+[PAGE_TABLE_BASE + 9] = "0100";
+[PAGE_TABLE_BASE + 10] = 70;
+[PAGE_TABLE_BASE + 11] = "0100";
+[PAGE_TABLE_BASE + 12] = -1;
+[PAGE_TABLE_BASE + 13] = "0000";
+[PAGE_TABLE_BASE + 14] = -1;
+[PAGE_TABLE_BASE + 15] = "0000";
+
+//Stack
+[PAGE_TABLE_BASE + 16] = 81;
+[PAGE_TABLE_BASE + 17] = "0110";
+[PAGE_TABLE_BASE + 18] = 82;
+[PAGE_TABLE_BASE + 19] = "0110";
+
+[81*512] = [69*512 + 1];
+
+//currently executing process
+[SYSTEM_STATUS_TABLE + 1] = 0;
+SP = 8*512;
+
+ireturn;
+

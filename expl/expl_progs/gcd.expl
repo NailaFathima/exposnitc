@@ -1,0 +1,37 @@
+decl
+int gcd(int  a,int b);
+enddecl
+int gcd(int a,int  b)
+{
+    decl
+        int c;
+    enddecl
+    begin
+        if(a==0) then
+            c=b;
+        else
+            c=gcd(b%a,a);
+        endif;
+        return c;
+    end
+}
+int main()
+{
+    decl
+        int a,b,c;
+        str input,ans;
+    enddecl
+    begin
+    	//a=2000;
+    	//write(a);
+    	input = "Enter two numbers : ";
+    	write(input);
+        read(a);
+        read(b);
+        c=gcd(a,b);
+        ans = "GCD is: ";
+       	write(ans);
+        write(c);
+        return 0;
+    end
+}

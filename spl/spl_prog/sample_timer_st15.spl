@@ -8,7 +8,10 @@ backup;
 
 [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1] * 16 + 4] = READY;
 
+breakpoint;
+
 call SCHEDULER;
+
 
 restore;
 

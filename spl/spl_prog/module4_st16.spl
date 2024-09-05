@@ -1,0 +1,45 @@
+//DISK DEVICE MANAGER MODULE
+
+alias functionNum R1;
+alias currentPid R2;
+alias word R3;
+alias physicalwordaddr R4;
+
+//Terminal_write
+if(functionNum == 3) then
+	//calling Acquire Terminal
+	multipush(R1,R2,R3,R4);
+	functionNum = 8;
+	call RESOURCE_MANAGER;
+	multipop(R1,R2,R3,R4);
+	print word;
+	
+	//calling release Terminal
+	multipush(R0,R1,R2,R3);
+	functionNum = 9;
+	call RESOURCE_MANAGER;
+	multipop(R0,R1,R2,R3);
+endif;
+
+
+//terminal_Read
+if(functionNum == 4) then
+	multipush(R1,R2,R3,R4);
+	functionNum = 8;
+	call RESOURCE_MANAGER;
+	multipop(R1,R2,R3,R4);
+	breakpoint;
+	read;
+	[PROCESS_TABLE + (currentPid * 16) + 4] = WAIT_TERMINAL;
+	
+	multipush(R1,R2,R3,R4);
+	call SCHEDULER;
+	multipop(R1,R2,R3,R4);
+	
+	physicalwordaddr = ([PTBR + 2 * ((word)/ 512)] * 512) + ((word) % 512);
+
+        [physicalwordaddr] = [PROCESS_TABLE + ( [SYSTEM_STATUS_TABLE + 1] * 16) + 8];
+	
+endif;
+
+return;
