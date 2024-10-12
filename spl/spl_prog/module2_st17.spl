@@ -1,0 +1,53 @@
+//MEMORY_MANAGER MODULE
+
+alias functionNum R1;
+alias releasePageNo R2;
+alias newPage R3;
+
+//GET FREE PAGE
+if(functionNum == 1) then
+	[SYSTEM_STATUS_TABLE + 3] = [SYSTEM_STATUS_TABLE + 3] + 1;
+	while([SYSTEM_STATUS_TABLE + 2] == 0) do
+		[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) + 4] = WAIT_MEM;
+		call SCHEDULER;
+	endwhile;
+	[SYSTEM_STATUS_TABLE + 3] = [SYSTEM_STATUS_TABLE + 3] - 1;
+	[SYSTEM_STATUS_TABLE + 2] = [SYSTEM_STATUS_TABLE + 2] - 1;
+	
+	newPage = 0;
+	
+	while( [MEMORY_FREE_LIST + newPage] != 0 && newPage < NUM_MEM_PAGES) do
+		newPage = newPage + 1;
+	endwhile;
+	
+	[MEMORY_FREE_LIST + newPage ] = 1;
+	
+	R0 = newPage;
+	//breakpoint;
+	return;
+	
+endif;
+
+//RELEASE PAGE
+if(functionNum == 2) then
+	//memory free list
+	[MEMORY_FREE_LIST + releasePageNo] = [MEMORY_FREE_LIST + releasePageNo] - 1;
+	
+	if( [MEMORY_FREE_LIST + releasePageNo] == 0) then
+		[SYSTEM_STATUS_TABLE + 2] = [SYSTEM_STATUS_TABLE + 2] + 1;
+	endif;
+	
+	alias index R0;
+	index = 0;
+	while(index != 16) do
+		if ( [PROCESS_TABLE + (index*16) + 4] == WAIT_MEM) then
+			[PROCESS_TABLE + (index*16) + 4] = READY;
+		endif;
+		index = index + 1;
+	endwhile;
+	
+	//breakpoint;
+	return;
+endif;
+	
+	
