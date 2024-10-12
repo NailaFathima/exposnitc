@@ -1,0 +1,62 @@
+//RESOURCE MANAGER MODULE
+
+alias functionNum R1;
+
+//acquire disk
+if(functionNum == 3) then
+	alias currentPID R2;
+	
+	//wait for disk to be released
+	while( [DISK_STATUS_TABLE + 0] == 1) do
+		[PROCESS_TABLE + (currentPID * 16) + 4 ] = WAIT_DISK;
+		multipush(R1,R2,R3);
+		call SCHEDULER;
+		multipop(R1,R2,R3);
+	endwhile;
+	
+	//Now disk is free
+	[DISK_STATUS_TABLE + 0] = 1;
+	[DISK_STATUS_TABLE + 4] = currentPID;
+	
+endif;
+
+//acquiring terminal
+if(functionNum == 8) then 
+	alias currentPID R2;
+	//waiting for terminal to be release
+	while( [TERMINAL_STATUS_TABLE + 0] == 1) do
+		[PROCESS_TABLE + (currentPID * 16) + 4] = WAIT_TERMINAL;
+		multipush(R1, R2, R3);
+		call SCHEDULER;
+		multipop(R1, R2, R3);
+	endwhile;
+	
+	[TERMINAL_STATUS_TABLE + 0] = 1;
+	[TERMINAL_STATUS_TABLE + 1] = currentPID;
+	
+endif;
+
+if(functionNum == 9) then
+	alias currentPID R2;
+	alias index R4;
+	
+	if(currentPID != ([TERMINAL_STATUS_TABLE + 1]) ) then
+		R0 = -1;
+		//return;
+	else
+		[TERMINAL_STATUS_TABLE + 0] = 0;
+		index = 0;
+		while( index!=16) do
+			if([PROCESS_TABLE + (index*16) + 4] == WAIT_TERMINAL) then
+				[PROCESS_TABLE + (index*16) + 4] = READY;
+			endif;
+			index = index + 1;
+		endwhile;
+		R0 = 0;
+	endif;
+endif;
+
+return;
+		
+	
+	
