@@ -23,7 +23,7 @@ if(functionNum == 1) then
 	[MEMORY_FREE_LIST + newPage ] = 1;
 	
 	R0 = newPage;
-	//breakpoint;
+	breakpoint;
 	return;
 	
 endif;
@@ -46,7 +46,7 @@ if(functionNum == 2) then
 		index = index + 1;
 	endwhile;
 	
-	//breakpoint;
+	breakpoint;
 	return;
 endif;
 	

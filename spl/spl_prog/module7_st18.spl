@@ -54,7 +54,7 @@ loadi(8,21);
 loadi(9,22);
 
 //loading disk interrupt
-loadi(6, 19);
+loadi(6,19);
 loadi(7,20);
 
 //loading int 6
@@ -157,16 +157,22 @@ endwhile;
 [PROCESS_TABLE + 16*14 + 4] = TERMINATED;
 [PROCESS_TABLE + 16*15 + 4] = TERMINATED;
 
-//memory free list
-alias i R0;
-i=0;
-while(i!=128)do
-    if (i < 83) then
-        [MEMORY_FREE_LIST+i]=1;
-    else 
-        [MEMORY_FREE_LIST+i]=0;
-    endif;
-    i=i+1;
+///Mem Free List
+//initialise to 0
+R1=0;				//reserved for OS
+while(R1<=75) do 	
+	[57*512+R1]=1;
+	R1=R1+1;
+endwhile;
+R1=76;				//free  pages
+while(R1<=127) do 	
+	[57*512+R1]=0;
+	R1=R1+1;
+endwhile;
+R1=76;
+while(R1<=82) do
+	[57*512+R1]=1;
+	R1=R1+1;
 endwhile;
 
 [SYSTEM_STATUS_TABLE + 2] = 45;
