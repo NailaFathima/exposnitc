@@ -1,0 +1,21 @@
+int main()
+{
+decl
+    int temp;
+    str odd,even;
+enddecl
+begin
+
+    temp = exposcall("Read", -1, odd);
+    temp = exposcall("Read", -1, even);
+    temp = exposcall("Fork");
+
+    //return value = 0 then child process
+    if(temp == 0) then 
+        temp = exposcall("Exec", odd);    
+    else
+        temp = exposcall("Exec", even);
+    endif;
+    return 0;
+end
+}
