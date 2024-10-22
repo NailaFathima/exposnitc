@@ -36,6 +36,7 @@ if(functionNum == 8) then
 	
 endif;
 
+//release terminal
 if(functionNum == 9) then
 	alias currentPID R2;
 	alias index R4;
