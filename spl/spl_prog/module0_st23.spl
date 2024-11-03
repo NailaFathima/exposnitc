@@ -16,6 +16,53 @@ if (functionNumber == 3) then
     [DISK_STATUS_TABLE + 4] = currentPID;
 endif;
 
+//aquire inode
+if (functionNumber == 4) then
+    alias inodeNumber R2; 
+    alias currentPID R3;
+
+    //if the file is already opened, then set the status to wait, inodenumber and call the scheduler
+    //check the lock field in file_status_table
+    while ([FILE_STATUS_TABLE + inodeNumber*4 + 0] != -1) do
+        [PROCESS_TABLE + (currentPID*16) + 4] = WAIT_FILE;
+        [PROCESS_TABLE + (currentPID*16) + 5] = inodeNumber;
+        multipush(R1, R2, R3);
+        call SCHEDULER;
+        multipop(R1, R2, R3);
+    endwhile;
+
+    //if by the time the file becomes available, the file was deleted
+    if ([INODE_TABLE + inodeNumber*16 + 1] == -1) then 
+        R0 = -1;
+    else
+        //set the locking pid to curreent pid and return 0 (success)
+        [FILE_STATUS_TABLE + inodeNumber*4 + 0] = currentPID;
+        R0 = 0;
+    endif;
+endif;
+
+//release inode
+if (functionNumber == 5) then
+    alias inodeNumber R2;
+    alias currentPID R3;
+
+    if ([FILE_STATUS_TABLE + inodeNumber*4 + 0] == currentPID) then
+        //i9f the locking pid == current pid , then free the lock and wake up all the processes whose state = wait, inodenumber
+        [FILE_STATUS_TABLE + inodeNumber*4 + 0] = -1;
+        alias counter R4;
+        counter = 0;
+        while (counter < MAX_PROC_NUM) do
+            if ([PROCESS_TABLE + (counter*16) + 4] == WAIT_FILE && [PROCESS_TABLE + (counter*16) + 5] == inodeNumber) then
+                [PROCESS_TABLE + (counter*16) + 4] = READY;
+            endif;
+            counter = counter + 1;
+        endwhile;
+        R0 = 0;
+    else
+    //if the locking pid != current pid, then return -1
+        R0 = -1;
+    endif;
+endif;
 
 //acquire semaphore
 if (functionNumber == 6) then
