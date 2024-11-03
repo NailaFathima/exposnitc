@@ -1,0 +1,73 @@
+//breakpoint;
+//RESOURCE_TABLE_OFFSET = 496
+alias userSP R5;
+userSP = SP;
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE+1]*16) + 13] = SP;
+SP = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE+1]*16) + 11]*512 - 1;
+
+alias syscallNumber R1;
+syscallNumber = [[PTBR + 2*((userSP-5)/512)]*512 + (userSP-5)%512];
+
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE+1]*16) + 9] = syscallNumber;
+
+//SEMGET
+if(syscallNumber == 17) then
+    alias counter R2;
+    counter = 0;
+
+    //checking if there's any free entry in the per-process resource table (max entries = 8 incl files and semaphores)
+    while([[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE+1]*16) + 11]*512 + RESOURCE_TABLE_OFFSET + counter*2] != -1 && counter < 8) do 
+        counter = counter+1;
+    endwhile;
+
+    if (counter == 8) then 
+        //no space left in pre process resource table
+        [[PTBR + 2*((userSP-1)/512)]*512 + (userSP-1)%512] = -1;
+    else
+        //check if there's any free entry in the semaphore table; call acquire sempahore in resource manager module
+        multipush(R1, R2, R5);
+        R1 = 6;
+        R2 = [SYSTEM_STATUS_TABLE+1];
+        call RESOURCE_MANAGER;
+        multipop(R1, R2, R5);
+
+        if (R0 == -1) then //no semaphores left
+            [[PTBR + 2*((userSP-1)/512)]*512 + (userSP-1)%512] = -2;
+        else
+            [[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE+1]*16) + 11]*512 + RESOURCE_TABLE_OFFSET + counter*2] = 1; //set to 1 to indicate its a sempahore
+            [[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE+1]*16) + 11]*512 + RESOURCE_TABLE_OFFSET + counter*2 + 1] = R0; //storing the index of semaphore entry in per-process resource table
+            [[PTBR + 2*((userSP-1)/512)]*512 + (userSP-1)%512] = counter; //return per-process resource table idex i.e semaphore descriptor
+        endif;
+    endif;
+
+endif;
+
+
+//SEM_RELEASE
+if (syscallNumber == 18) then 
+    breakpoint;
+    alias semaphoreID R2;
+    semaphoreID = [[PTBR + 2*((userSP-4)/512)]*512 + (userSP-4)%512];
+    //semaphoreID is basically the per-process-resource-table index of the semaphore
+    //if semaphoreId is invalid, return -1
+    if (semaphoreID < 0 || semaphoreID > 7 || [[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE+1]*16) + 11]*512 + RESOURCE_TABLE_OFFSET + 2*semaphoreID] != 1) then 
+        [[PTBR + 2*((userSP-1)/512)]*512 + (userSP-1)%512] = -1;
+    else
+        //call release_semaphor efunction in resource manager
+        multipush(R1, R2, R5);
+        R1 = 7;
+        R2 = [[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE+1]*16) + 11]*512 + RESOURCE_TABLE_OFFSET + 2*semaphoreID + 1];
+        R3 = [SYSTEM_STATUS_TABLE+1];
+        call RESOURCE_MANAGER;
+        multipop(R1, R2, R5);
+        //Invalidate the per-process-resource-table entry of the semaphore
+        [[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE+1]*16) + 11]*512 + RESOURCE_TABLE_OFFSET + 2*semaphoreID] = -1;
+        [[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE+1]*16) + 11]*512 + RESOURCE_TABLE_OFFSET + 2*semaphoreID + 1] = -1;
+    endif;
+endif;
+
+//set the mode flag to 0
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE+1]*16) + 9] = 0;
+SP = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE+1]*16) + 13];
+breakpoint;
+ireturn;
