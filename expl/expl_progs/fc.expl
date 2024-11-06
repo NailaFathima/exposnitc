@@ -11,6 +11,10 @@ int main() {
 
         temp = exposcall("Create", fileName, permission);
         temp = exposcall("Write",-2,"File Created");
+        temp = exposcall("Write",-2,temp);
+
+
+        temp = exposcall("Shutdown");
         return 0;
     end
 }

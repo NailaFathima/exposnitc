@@ -17,6 +17,9 @@ loadi(9, 22);
 //INT 4
 loadi(10, 23);
 loadi(11, 24);
+//INT5
+loadi(12, 25);
+loadi(13, 26);
 //INT 6
 loadi(14,27);
 loadi(15,28);
@@ -57,6 +60,9 @@ loadi(43,56);
 //MODULE 2 - MEMORY_MANAGER MODULE
 loadi(44,57);
 loadi(45,58);
+//MODULE 3 - FILE MANAGER MODULE
+loadi(46, 59);
+loadi(47, 60);
 //MODULE 4 - DISK DEVICE_MANAGER MODULE
 loadi(48,61);
 loadi(49,62);
@@ -221,6 +227,15 @@ while (counter < MAX_BUFFER) do
     [BUFFER_TABLE + counter*4 + 0] = -1; //block number
     [BUFFER_TABLE + counter*4 + 1] = 0; //dirty bit
     [BUFFER_TABLE + counter*4 + 2] = -1; //locking pid
+
+    counter = counter+1;
+endwhile;
+
+//initializing open file table
+counter = 0;
+while (counter < MAX_OPENFILE_NUM) do
+    [OPEN_FILE_TABLE + counter*4 + 0] = -1;
+    [OPEN_FILE_TABLE + counter*4 + 1] = 0;
 
     counter = counter+1;
 endwhile;
